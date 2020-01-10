@@ -1,7 +1,7 @@
 Summary: A utility for unpacking zip files
 Name: unzip
 Version: 6.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Applications/Archiving
 Source: http://downloads.sourceforge.net/infozip/unzip60.tar.gz
@@ -18,6 +18,10 @@ Patch4: unzip-6.0-attribs-overflow.patch
 # Not sent to upstream, as it's Fedora/RHEL specific.
 # Modify the configure script not to request the strip of binaries.
 Patch5: unzip-6.0-nostrip.patch
+Patch6: unzip-6.0-cve-2014-9636.patch
+Patch7: unzip-6.0-cve-2014-8139.patch
+Patch8: unzip-6.0-cve-2014-8140.patch
+Patch9: unzip-6.0-cve-2014-8141.patch
 
 URL: http://www.info-zip.org/UnZip.html
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -41,6 +45,10 @@ a zip archive.
 %patch3 -p1 -b .close
 %patch4 -p1 -b .attribs-overflow
 %patch5 -p1 -b .nostrip
+%patch6 -p1 -b .cve-2014-9636.patch
+%patch7 -p1 -b .cve-2014-8139.patch
+%patch8 -p1 -b .cve-2014-8140.patch
+%patch9 -p1 -b .cve-2014-8141.patch
 
 %build
 make -f unix/Makefile CF_NOOPT="-I. -DUNIX $RPM_OPT_FLAGS" generic_gcc %{?_smp_mflags}
@@ -59,6 +67,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/*/*
 
 %changelog
+* Wed Feb 25 2015 Petr Stodulka <pstodulk@redhat.com> - 6.0-2
+- Fix CVE-2014-9636 CVE-2014-8139 CVE-2014-8140 CVE-2014-8141
+  Resolves: #1196132 #1196120 #1196124 #1196128
+
 * Tue May 25 2010 Karel Klic <kklic@redhat.com> - 6.0-1
 - Rebase to upstream 6.0
   Resolves: #594860
