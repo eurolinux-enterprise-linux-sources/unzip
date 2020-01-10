@@ -1,7 +1,7 @@
 Summary: A utility for unpacking zip files
 Name: unzip
 Version: 6.0
-Release: 2%{?dist}
+Release: 4%{?dist}
 License: BSD
 Group: Applications/Archiving
 Source: http://downloads.sourceforge.net/infozip/unzip60.tar.gz
@@ -22,6 +22,11 @@ Patch6: unzip-6.0-cve-2014-9636.patch
 Patch7: unzip-6.0-cve-2014-8139.patch
 Patch8: unzip-6.0-cve-2014-8140.patch
 Patch9: unzip-6.0-cve-2014-8141.patch
+Patch10: unzip-6.0-alt-iconv-utf8.patch
+Patch11: unzip-6.0-symlink.patch
+Patch12: unzip-6.0-format-secure.patch
+Patch13: unzip-6.0-alt-iconv-utf8-print.patch
+
 
 URL: http://www.info-zip.org/UnZip.html
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -49,6 +54,10 @@ a zip archive.
 %patch7 -p1 -b .cve-2014-8139.patch
 %patch8 -p1 -b .cve-2014-8140.patch
 %patch9 -p1 -b .cve-2014-8141.patch
+%patch10 -p1 -b .alt-iconv-utf8.patch
+%patch11 -p1 -b .symlink.patch
+%patch12 -p1 -b .format-secure
+%patch13 -p1 -b .utf-print
 
 %build
 make -f unix/Makefile CF_NOOPT="-I. -DUNIX $RPM_OPT_FLAGS" generic_gcc %{?_smp_mflags}
@@ -62,14 +71,24 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%doc README BUGS LICENSE 
+%doc README BUGS LICENSE
 %{_bindir}/*
 %{_mandir}/*/*
 
 %changelog
+* Wed Nov 25 2015 Petr Stodulka <pstodulk@redhat.com> - 6.0-4
+- Added patch for build option "-Werror=format-security"
+- Fix print of non-ascii filenames
+  Resolves: rhbz#1284896
+
+* Fri Oct 30 2015 Petr Stodulka <pstodulk@redhat.com> - 6.0-3
+- Fix problem with symlink errors in archive with many files
+- add support of non-latin and non-unicode encodings for filenames
+  Resolves: rhbz#740012 rhbz#885540
+
 * Wed Feb 25 2015 Petr Stodulka <pstodulk@redhat.com> - 6.0-2
 - Fix CVE-2014-9636 CVE-2014-8139 CVE-2014-8140 CVE-2014-8141
-  Resolves: #1196132 #1196120 #1196124 #1196128
+  Resolves: #1196133 #1196121 #1196125 #1196129
 
 * Tue May 25 2010 Karel Klic <kklic@redhat.com> - 6.0-1
 - Rebase to upstream 6.0
@@ -78,19 +97,19 @@ rm -rf $RPM_BUILD_ROOT
 - Generate debuginfos (rhbz#540220, unzip-6.0-nostrip.patch)
 - New upstream version
 - Compiled using `make generic_gcc` (includes asm)
-- Removed unzip542-rpmoptflags.patch, because RPM_OPT_FLAGS 
+- Removed unzip542-rpmoptflags.patch, because RPM_OPT_FLAGS
   are provided using command line
-- Removed unzip-5.51-link-segv.patch, because the link file 
+- Removed unzip-5.51-link-segv.patch, because the link file
   is not reopened in the current version
-- Removed unzip-5.51-link-segv2.patch, the bug was already fixed 
+- Removed unzip-5.51-link-segv2.patch, the bug was already fixed
   in open_outfile in 5.52
-- Removed unzip-5.52-toctou.patch (CAN-2005-2475), the vulnerability 
+- Removed unzip-5.52-toctou.patch (CAN-2005-2475), the vulnerability
   is fixed in the current version
-- Removed unzip-5.52-near-4GB.patch, unzip-5.52-near-4GB2.patch, 
-  unzip-5.52-4GB3.patch, and unzip-5.52-4GB_types.patch, because 
+- Removed unzip-5.52-near-4GB.patch, unzip-5.52-near-4GB2.patch,
+  unzip-5.52-4GB3.patch, and unzip-5.52-4GB_types.patch, because
   the current version supports large files
 - Removed unzip-5.52-long-filename.patch, the current version
-  fixes the vulnerability by checking the length of command line 
+  fixes the vulnerability by checking the length of command line
   arguments in unzip.c
 - Removed unzip-5.52-makefile.patch, because we no longer create
   the link manually
@@ -129,10 +148,10 @@ rm -rf $RPM_BUILD_ROOT
 - fix open call
 
 * Wed Feb  7 2007 Ivana Varekova <varekova@redhat.com> - 5.52-4
-- incorporate the next peckage review comment  
+- incorporate the next peckage review comment
 
 * Tue Feb  6 2007 Ivana Varekova <varekova@redhat.com> - 5.52-3
-- Resolves: 226516 
+- Resolves: 226516
   Incorporate the package review
 
 * Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - 5.52-2.2.1
@@ -158,7 +177,7 @@ rm -rf $RPM_BUILD_ROOT
 - fix bug 164928 - TOCTOU issue in unzip
 
 * Mon May  9 2005 Ivana Varekova <varekova@redhat.com> 5.51-11
-- fix bug 156959 â€“ invalid file mode on created files 
+- fix bug 156959 â€“ invalid file mode on created files
 
 * Mon Mar  7 2005 Ivana Varekova <varekova@redhat.com> 5.51-10
 - rebuilt
@@ -310,7 +329,7 @@ include quote and/or control characters.
 * Mon May 21 2001 Trond Eivind Glomsrød <teg@redhat.com>
 - 5.42
 - Don't strip binaries explicitly
-- build without assembly, it doesn't seem to increase performance 
+- build without assembly, it doesn't seem to increase performance
 - make it respect RPM_OPT_FLAGS, define _GNU_SOURCE
 - use %%{_tmppath}
 - "License:" replaces "Copyright:"
@@ -333,7 +352,7 @@ include quote and/or control characters.
 * Fri Jul 30 1999 Bill Nottingham <notting@redhat.com>
 - update to 5.40
 
-* Sun Mar 21 1999 Cristian Gafton <gafton@redhat.com> 
+* Sun Mar 21 1999 Cristian Gafton <gafton@redhat.com>
 - auto rebuild in the new build environment (release 5)
 
 * Thu Dec 17 1998 Michael Maher <mike@redhat.com>
