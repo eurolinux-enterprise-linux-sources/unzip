@@ -1,7 +1,7 @@
 Summary: A utility for unpacking zip files
 Name: unzip
 Version: 6.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: BSD
 Group: Applications/Archiving
 Source: http://downloads.sourceforge.net/infozip/unzip60.tar.gz
@@ -26,6 +26,9 @@ Patch10: unzip-6.0-alt-iconv-utf8.patch
 Patch11: unzip-6.0-symlink.patch
 Patch12: unzip-6.0-format-secure.patch
 Patch13: unzip-6.0-alt-iconv-utf8-print.patch
+Patch14: unzip-6.0-fix-recmatch.patch
+Patch15: unzip-6.0-caseinsensitive.patch
+
 
 
 URL: http://www.info-zip.org/UnZip.html
@@ -58,6 +61,8 @@ a zip archive.
 %patch11 -p1 -b .symlink.patch
 %patch12 -p1 -b .format-secure
 %patch13 -p1 -b .utf-print
+%patch14 -p1 -b .recmatch
+%patch15 -p1 -b .caseinsensitive
 
 %build
 make -f unix/Makefile CF_NOOPT="-I. -DUNIX $RPM_OPT_FLAGS" generic_gcc %{?_smp_mflags}
@@ -76,6 +81,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/*/*
 
 %changelog
+* Tue Jul 12 2016 Petr Stodulka <pstodulk@redhat.com> - 6.0-5
+- fix recmatch, resolve license issue
+  Resolves: rhbz#1355828
+
 * Wed Nov 25 2015 Petr Stodulka <pstodulk@redhat.com> - 6.0-4
 - Added patch for build option "-Werror=format-security"
 - Fix print of non-ascii filenames
