@@ -1,7 +1,7 @@
 Summary: A utility for unpacking zip files
 Name: unzip
 Version: 6.0
-Release: 15%{?dist}
+Release: 16%{?dist}
 License: BSD
 Group: Applications/Archiving
 Source: http://downloads.sourceforge.net/infozip/unzip60.tar.gz
@@ -30,6 +30,17 @@ Patch10: unzip-6.0-cve-2014-9636.patch
 Patch11: unzip-6.0-cve-2014-8139.patch
 Patch12: unzip-6.0-cve-2014-8140.patch
 Patch13: unzip-6.0-cve-2014-8141.patch
+Patch14: unzip-6.0-format-secure.patch
+Patch15: unzip-6.0-alt-iconv-utf8.patch
+Patch16: unzip-6.0-alt-iconv-utf8-print.patch
+Patch17: unzip-6.0-symlink.patch
+
+#Patch14: unzip-6.0-alt-iconv-utf8.patch
+#Patch15: unzip-6.0-symlink.patch
+#Patch16: unzip-6.0-format-secure.patch
+#Patch17: unzip-6.0-alt-iconv-utf8-print.patch
+
+
 URL: http://www.info-zip.org/UnZip.html
 BuildRequires:  bzip2-devel
 
@@ -59,7 +70,10 @@ a zip archive.
 %patch11 -p1 -b .cve-2014-8139.patch
 %patch12 -p1 -b .cve-2014-8140.patch
 %patch13 -p1 -b .cve-2014-8141.patch
-
+%patch14 -p1 -b .wformat
+%patch15 -p1 -b .utf
+%patch16 -p1 -b .utf-print
+%patch17 -p1 -b .symlink
 
 %build
 make -f unix/Makefile CF_NOOPT="-I. -DUNIX $RPM_OPT_FLAGS" generic_gcc %{?_smp_mflags}
@@ -75,6 +89,14 @@ make -f unix/Makefile prefix=$RPM_BUILD_ROOT%{_prefix} MANDIR=$RPM_BUILD_ROOT/%{
 %{_mandir}/*/*
 
 %changelog
+* Wed Nov 25 2015 Petr Stodulka <pstodulk@redhat.com> - 6.0-16
+- Added patch for build option "-Werror=format-security"
+- Added support of non-unicode non-latin charset
+- Fix print of non-ascii filenames
+- Fix troubles with symlinks for archives with many files
+  Resolves: rhbz#1276746, rhbz#1286165, rhbz#1276744
+
+
 * Wed Feb 25 2015 Petr Stodulka <pstodulk@redhat.com> - 6.0-15
 - Fix CVE-2014-9636 CVE-2014-8139 CVE-2014-8140 CVE-2014-8141
   Resolves: #1196134 #1196122 #1196126 #1196130
