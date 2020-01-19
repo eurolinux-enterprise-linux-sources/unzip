@@ -1,7 +1,7 @@
 Summary: A utility for unpacking zip files
 Name: unzip
 Version: 6.0
-Release: 14%{?dist}
+Release: 15%{?dist}
 License: BSD
 Group: Applications/Archiving
 Source: http://downloads.sourceforge.net/infozip/unzip60.tar.gz
@@ -26,6 +26,10 @@ Patch7: unzip-6.0-fix-recmatch.patch
 Patch8: unzip-6.0-manpageandusage.patch
 # downstream patch - repair file mach.c
 Patch9: unzip-6.0-caseinsensitive.patch
+Patch10: unzip-6.0-cve-2014-9636.patch
+Patch11: unzip-6.0-cve-2014-8139.patch
+Patch12: unzip-6.0-cve-2014-8140.patch
+Patch13: unzip-6.0-cve-2014-8141.patch
 URL: http://www.info-zip.org/UnZip.html
 BuildRequires:  bzip2-devel
 
@@ -51,6 +55,11 @@ a zip archive.
 %patch7 -p1 -b .recmatch
 %patch8 -p1 -b .usage
 %patch9 -p1 -b .caseinsensitive
+%patch10 -p1 -b .cve-2014-9636.patch
+%patch11 -p1 -b .cve-2014-8139.patch
+%patch12 -p1 -b .cve-2014-8140.patch
+%patch13 -p1 -b .cve-2014-8141.patch
+
 
 %build
 make -f unix/Makefile CF_NOOPT="-I. -DUNIX $RPM_OPT_FLAGS" generic_gcc %{?_smp_mflags}
@@ -66,6 +75,10 @@ make -f unix/Makefile prefix=$RPM_BUILD_ROOT%{_prefix} MANDIR=$RPM_BUILD_ROOT/%{
 %{_mandir}/*/*
 
 %changelog
+* Wed Feb 25 2015 Petr Stodulka <pstodulk@redhat.com> - 6.0-15
+- Fix CVE-2014-9636 CVE-2014-8139 CVE-2014-8140 CVE-2014-8141
+  Resolves: #1196134 #1196122 #1196126 #1196130
+
 * Tue Jul 22 2014 Petr Stodulka <pstodulk@redhat.com> - 6.0-14
 - Fix caseinsensitive bug
   Resolves: #1104018
