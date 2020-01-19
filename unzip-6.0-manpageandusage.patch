@@ -1,0 +1,59 @@
+diff -urNp unzip60-orig/man/zipinfo.1 unzip60/man/zipinfo.1
+--- unzip60-orig/man/zipinfo.1	2009-04-20 00:39:00.000000000 +0200
++++ unzip60/man/zipinfo.1	2013-09-27 14:30:41.650716964 +0200
+@@ -39,10 +39,10 @@
+ zipinfo \- list detailed information about a ZIP archive
+ .PD
+ .SH SYNOPSIS
+-\fBzipinfo\fP [\fB\-12smlvhMtTz\fP] \fIfile\fP[\fI.zip\fP]
++\fBzipinfo\fP [\fB\-12CsmlvhMtTz\fP] \fIfile\fP[\fI.zip\fP]
+ [\fIfile(s)\fP\ .\|.\|.] [\fB\-x\fP\ \fIxfile(s)\fP\ .\|.\|.]
+ .PP
+-\fBunzip\fP \fB\-Z\fP [\fB\-12smlvhMtTz\fP] \fIfile\fP[\fI.zip\fP]
++\fBunzip\fP \fB\-Z\fP [\fB\-12CsmlvhMtTz\fP] \fIfile\fP[\fI.zip\fP]
+ [\fIfile(s)\fP\ .\|.\|.] [\fB\-x\fP\ \fIxfile(s)\fP\ .\|.\|.]
+ .PD
+ .\" =========================================================================
+@@ -112,6 +112,10 @@ list filenames only, one per line, but a
+ (\fB\-t\fP) and zipfile comments (\fB\-z\fP), as well.  This option may be
+ useful in cases where the stored filenames are particularly long.
+ .TP
++.B \-C
++use case\-insensitive matching for the selection of archive entries from
++the command\-line list of extract selection patterns.
++.TP
+ .B \-s
+ list zipfile info in short Unix ``\fCls \-l\fR'' format.  This is the default
+ behavior; see below.
+diff -urNp unzip60-orig/unzip.c unzip60/unzip.c
+--- unzip60-orig/unzip.c	2009-04-16 20:26:52.000000000 +0200
++++ unzip60/unzip.c	2013-09-27 14:45:14.074371612 +0200
+@@ -318,8 +318,8 @@ ZipInfo %d.%d%d%s of %s, by Greg Roelofs
+ List name, date/time, attribute, size, compression method, etc., about files\n\
+ in list (excluding those in xlist) contained in the specified .zip archive(s).\
+ \n\"file[.zip]\" may be a wildcard name containing %s.\n\n\
+-   usage:  zipinfo [-12smlvChMtTz] file[.zip] [list...] [-x xlist...]\n\
+-      or:  unzip %s-Z%s [-12smlvChMtTz] file[.zip] [list...] [-x xlist...]\n";
++   usage:  zipinfo [-12smlvCUhMtTz] file[.zip] [list...] [-x xlist...]\n\
++      or:  unzip %s-Z%s [-12smlvCUhMtTz] file[.zip] [list...] [-x xlist...]\n";
+ 
+ static ZCONST char Far ZipInfoUsageLine2[] = "\nmain\
+  listing-format options:             -s  short Unix \"ls -l\" format (def.)\n\
+@@ -331,6 +331,7 @@ static ZCONST char Far ZipInfoUsageLine3
+   -h  print header line       -t  print totals for listed files or for all\n\
+   -z  print zipfile comment   -T  print file times in sortable decimal format\
+ \n  -C  be case-insensitive   %s\
++  -U  use escapes for all non-ASCII Unicode\n\
+   -x  exclude filenames that follow from listing\n";
+ #ifdef MORE
+    static ZCONST char Far ZipInfoUsageLine4[] =
+@@ -2295,6 +2296,9 @@ static void help_extended(__G)
+   "unzipsfx modifiers:",
+   "  Most unzip modifiers are supported.  These include",
+   "  -a     - Convert text files.",
++  "  -b     - treat all files as binary (no text conversions)",
++  "  -D     - skip restoration  of timestamps for extracted items.",
++  "  -M     - pipe all output through an internal pager (similar to more(1)).",
+   "  -n     - Never overwrite.",
+   "  -o     - Overwrite without prompting.",
+   "  -q     - Quiet operation.",
